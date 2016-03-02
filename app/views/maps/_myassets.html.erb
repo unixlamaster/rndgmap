@@ -1,0 +1,62 @@
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+      }
+      #map-canvas {
+        height: 100%;
+        width: 100%;
+        margin: 0px;
+        padding: 0px;
+        float: left
+      }
+      #contentWindow {
+      }
+      #search {
+        width: 100%;
+        margin: 0px;
+        padding: 0px;
+      }
+	.ui-autocomplete {
+	background-color: white;
+	width: 300px;
+	border: 1px solid #cfcfcf;
+	list-style-type: none;
+	padding-left: 0px;
+      }
+    </style>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyB8_fY78Np6-muxaUYN0RHYaiAnaYxXh0A&sensor=false"></script>
+
+<script type="text/javascript">
+var geocoder;
+var map;
+var marker;
+function initialize() {
+  var rostov = new google.maps.LatLng(47.23333,39.71667);
+  var mapOptions = {
+    zoom: 14,
+    center: rostov,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  }
+
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+ //Определение геокодера
+//  geocoder = new google.maps.Geocoder();
+        
+//  marker = new google.maps.Marker({
+//    map: map,
+//    draggable: true
+//  });
+}
+
+$(document).ready(function() { 
+
+  initialize();
+
+});
+
+
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>

@@ -1,0 +1,28 @@
+<table width=100%>
+  <td width=15%>
+     <%= form_tag maps_path, :method => 'get', :id => 'myform' do %>
+       <% select_obj = params[:objclass].nil? ? [] : params[:objclass]
+          @type_objs.each do |to| %>
+         <input  id=<%= to.id %> type=hidden name=objclass[] value='<%= to.objclass if select_obj.include?(to.objclass) %>'>
+         <a href=# class="button small <%= select_obj.include?(to.objclass) ? 'disable' : 'secondary' %>"  onclick="$('#<%= to.id %>').val('<%= to.objclass%>'); $('#myform').submit();" style="width: 100%;"><img src=<%= to.src %>> - <%= to.objclass%></a><br>
+       <% end %>
+     <hr>
+       <% 2010.upto(2015) do |year| %>
+          <div class="row">
+            <div class="small-6 columns">
+            <div class="switch"><input id="year<%=year%>" type="checkbox" <%= "checked" if ! params[:year].nil? && params[:year].include?(year.to_s) %> onchange="$('#myform').submit();" name="year" value=<%=year%>>
+                <label for="year<%=year%>"</label>
+              </div>
+            </div>
+            <div class="small-6 columns">
+              <%=year%>
+            </div>
+          </div>
+         <% end %>
+     <% end %>
+
+  </td>
+  <td width=85%>
+    <div id="map-canvas" style="width:100%; height:100%"></div>
+  </td>
+</table>

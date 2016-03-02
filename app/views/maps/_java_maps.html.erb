@@ -1,0 +1,369 @@
+<style>
+.b_ctrl {
+  padding: 0;
+  margin: 0;
+  border-collapse: collapse;
+  border: 0;
+  align: left;
+  font-size: 10pt;
+  font-weight: bold;
+}
+.td_img {
+  width: 25px;
+}
+
+.infowin {
+  vertical-align: top;
+  border: 1;
+}
+
+.infotext {
+  font-size: 9pt;
+}
+
+</style>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+    </script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyB8_fY78Np6-muxaUYN0RHYaiAnaYxXh0A&sensor=false">
+          </script>
+          <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+    <script>
+
+// In the following example, markers appear when the user clicks on the map.
+// The markers are stored in an array.
+// The user can then click an option to hide, show or delete the markers.
+    var map,
+        rostov_center = new google.maps.LatLng(48.2, 42,0),
+        infoWin = new google.maps.InfoWindow(),
+        show_objButtons = [], show_yearButtons = [],
+        mapobjs_typeof = {}, mapobjs_yearof = {},
+        controlDiv3 = document.createElement('div'),
+        infoText = document.createElement('div'),
+        allMarkers = [];
+
+function initialize() {
+  var mapOptions = {
+    zoom: 7,
+    center: rostov_center,
+    mapTypeId: google.maps.MapTypeId.HYBRID,
+    panControl: false,
+    zoomControl: true,
+    scaleControl: true,
+    streetViewControl: false,
+    mapTypeControl: false
+  },
+      contentString,
+      marker,position;
+
+
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+
+  var controlDiv = document.createElement('div');
+     controlDiv.style.width = '180px';  
+     controlDiv.style.marginTop = "20px";  
+  var control = new myControl(controlDiv, map);
+
+   controlDiv.index = 1;
+   map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlDiv);
+
+   var controlDiv2 = document.createElement('div');
+   controlDiv2.className = "transparency";
+   var control = new CenterControl(controlDiv2, map);
+
+/////////////   controlDiv2.index = 1;
+   map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(controlDiv2);
+
+    controlDiv3.style.width = '400px';
+    controlDiv3.style.display = 'none';
+    controlDiv3.style.marginTop = "200px";
+    controlDiv3.style.marginRight = "20px";
+//    controlDiv3.index = 1;
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv3);
+    infoText.style.padding = '15px';
+    infoText.style.width = '400px';
+    infoText.style.borderRadius = "3px";
+    infoText.style.backgroundColor = '#FFF';
+    infoText.style.cursor = "none";
+//    controlText.style.textAlign = "center";
+    infoText.style.fontFamily = "Roboto,Arial,sans-serif";
+    infoText.style.fontSize = "14px";
+//    controlText.style.paddingTop = "0";
+//    controlText.style.paddingBotton = "0";
+    infoText.innerHTML = '';
+    controlDiv3.appendChild(infoText);
+
+    google.maps.event.addListener(infoWin,'closeclick',function(){
+       controlDiv3.style.display = 'none';        
+    });
+
+
+<% @poligons.each do |poligon| %>
+     var triangleCoords = [
+           <%= poligon.coords.split("|").collect {|co| "new google.maps.LatLng(#{co})"}.join(',') %>
+                           ];
+
+     var poligon<%=poligon.id%> = new google.maps.Polygon({
+             paths: triangleCoords,
+             strokeColor: '#FFF',
+             strokeOpacity: 1,
+             strokeWeight: 1,
+//             fillColor: '#<%= poligon.color%>',
+             fillOpacity: 0.0
+          });
+
+      poligon<%=poligon.id%>.setMap(map);
+      google.maps.event.addListener(poligon<%=poligon.id%>, 'click', function(event){
+          infoWin.setContent('<a href=# onclick="moveToArea(<%= poligon.area.coords%>,<%= poligon.area.zoom%>);"><%= poligon.area.name %></a>');
+         infoWin.setPosition(event.latLng);
+         infoWin.open(map);
+         if (map.getZoom()<8) {
+           infoText.innerHTML = '<%= poligon.name.gsub(/[\n\r]/,'').html_safe %>';
+           controlDiv3.style.display = '';
+         }
+      });
+<% end %>
+
+
+// ================================================================
+
+  var ctaLayer = new google.maps.KmlLayer({
+    url: 'http://maps.yandex.ru/export/usermaps/LmSRCh-pxvZLSUls9unQJxQBgGJwE1Ib.kml'
+       });
+  ctaLayer.setMap(map);
+  map.setCenter(rostov_center);
+// ================================================================
+
+  var marker;
+  <% @mapobjs.each do |mapobj| 
+    url = "http://localhost:8080/#{mapobj.url}"
+     if mapobj.latitude =~/\d/ && mapobj.longitude=~/\d/ && mapobj.latitude.to_f < 50.25 && mapobj.latitude.to_f > 45.94 && mapobj.longitude.to_f < 44.35 && mapobj.longitude.to_f > 38.24 
+      %>
+    var marker = new google.maps.Marker({
+position: new google.maps.LatLng(<%= mapobj.latitude %>,<%= mapobj.longitude%>) ,
+                       map: null,
+                       title: "<%= mapobj.name.gsub(/[\r\n]/,'') %>",
+                       icon: "<%= mapobj.type_obj.src %>" });
+    google.maps.event.addListener(marker, 'click', function() {
+      controlDiv3.style.display = 'none';
+      infoWin.setContent("<table border=0 class=infotext><tr><td colspan=3 align=center><%= 
+                         case mapobj.url
+                         when /.jpg|.jpeg|.gif|.png/ 
+                           ("<img src=/images/"+mapobj.url+" width=500>").html_safe
+                         when /.mp4/
+#    "<video id=movie width=400 autoplay controls><source src=\\\"#{url}\\\" type='video/webm; codecs=\\\"vp8, vorbis\\\"' /></video>".html_safe
+   "<video id=movie width=500 controls  autoplay=autoplay><source src=\\\"#{url}\\\" type='video/mp4;' /><object id=flowplayer type=\\\"application/x-shockwave-flash\\\" ><param name=movie value=\\\"video/flowplayer-3.2.5.swf\\\" /><param name=flashvars value='config={\\\"clip\\\":\\\"#{url}\\\"}' /></object></video>".html_safe
+#   "<video id=movie width=400 controls  autoplay=autoplay><source src=\\\"#{url}\\\" type='video/webm; codecs=\\\"vp8, vorbis\\\"' /><object id=flowplayer type=\\\"application/x-shockwave-flash\\\" width=400 height=400><param name=movie value=\\\"video/flowplayer-3.2.5.swf\\\" /><param name=flashvars value='config={\\\"clip\\\":\\\"#{url}\\\"}' /></object></video>".html_safe
+                         else
+                           "<img src=/images/i.jpg>".html_safe
+  end
+
+        
+  %></td></tr><tr><td valign=top><b>Название:</td><td><%= mapobj.name.gsub(/[\r\n]/,'') %></td></tr><tr><td valign=top><b>Результат:</b></td><td valign=top><%= mapobj.result.gsub(/[\r\n]/,'') unless mapobj.result.nil? %></td></tr><tr><td valign=top><b>Объем работ:</b></td><td valign=top><%= mapobj.amount.gsub(/[\r\n]/,'') unless mapobj.amount.nil? %></td></tr><tr><td valign=top><b>Годы реализации:</b></td><td valign=top><%= mapobj.years2.gsub(/[\r\n]/,'') %></td></tr><tr><td valign=top><b>Стоимость:</b></td><td valign=top><%= mapobj.cost%> млн.руб.</td></tr></table>");
+        infoWin.setPosition(new google.maps.LatLng(<%= mapobj.latitude %>,<%= mapobj.longitude %>));
+        infoWin.open(map,this);
+    });
+    mapobjs_typeof[<%= mapobj.type_id %>].push(marker);
+    <% 2010.upto(2015) do |y| %>
+        <%= "mapobjs_yearof[#{y}].push(marker);".html_safe if mapobj.year.include?(y.to_s) %> 
+    <% end %>
+  <% end %>
+
+  <% if 1==2
+#      if !mapobj.line.nil? 
+       line_color = { 1=> "00F", 3=> "050", 5=> "F00"}
+       mapobj.line.split(/;/).each do |street| %>
+        var lineCoords = [<%= street.split("|").collect {|co| "new google.maps.LatLng(#{co})"}.join(',') %>];
+        var line<%=mapobj.id%> = new google.maps.Polygon({
+               paths: lineCoords,
+               strokeColor: '#<%= line_color[mapobj.type_id]%>',
+               strokeOpacity: 1,
+               strokeWeight: 2,
+               fillOpacity: 0.0
+         });
+         google.maps.event.addListener(line<%=mapobj.id%>, 'click', function() {
+           infoWin.setContent("<%= mapobj.type_obj.objclass+", "+mapobj.address.gsub(/\n/,'') %>");
+           infoWin.setPosition(line<%=mapobj.id%>.getCenter());
+           infoWin.open(map,this);
+         });
+        line<%=mapobj.id%>.setMap(map);
+       <% end
+     end %>
+<% end %>
+}
+
+// ----------------------------------------------------------
+function moveToArea(lat,lng,zoom) {
+  controlDiv3.style.display = 'none';
+  infoWin.setMap(null);
+  map.setZoom(zoom);
+  map.setCenter(new google.maps.LatLng(lat,lng));
+}
+
+//-----------------------------------------------------------
+function myControl(controlDiv, map) {
+
+  <% [1,2,6,7,3,4,5,10,12,11,8,9].map {|i| TypeObj.find(i) }.each do |to| %>
+ var controlUI = document.createElement('div');
+//     controlUI.style.opacity = '0.0';
+//     controlUI.style.backgroundColor = '#000';
+     controlUI.style.margin = "4px";
+     controlUI.style.pading = "1px";
+     controlUI.setAttribute('id', 'objclass<%=to.id%>');
+     controlDiv.appendChild(controlUI);
+ var controlText = document.createElement('div');
+     controlText.style.opacity = '0.8';
+     controlText.style.borderRadius = "3px";
+     controlText.style.backgroundColor = '#FFF';
+     controlText.style.cursor = "none";
+     controlText.style.textAlign = "center";
+     controlText.style.fontFamily = "Roboto,Arial,sans-serif";
+     controlText.style.fontSize = "10px";
+     controlText.style.paddingTop = "0";
+     controlText.style.paddingBotton = "0";
+     controlText.innerHTML = '<table class=b_ctrl width=100%><td class=td_img><img src=<%=to.src%> width=20 height=20></td><td align=center><%=to.objclass%></td></table>';
+     controlUI.appendChild(controlText);
+     show_objButtons[<%=to.id%>] = false;
+     google.maps.event.addDomListener(controlUI, 'click', function() {
+         if (show_objButtons[<%=to.id%>]) {
+           show_objButtons[<%=to.id%>] = false;
+           $("#objclass<%=to.id%>").css('backgroundColor','#fff');
+           $("#objclass<%=to.id%>").css('opacity','0.8');
+           controlDiv3.style.display = 'none';
+           }
+         else {
+           show_objButtons[<%=to.id%>] = true;
+           $("#objclass<%=to.id%>").css('backgroundColor','#0000CD');
+           $("#objclass<%=to.id%>").css('opacity','0.8');
+           <% if !type_info_array[to.id].nil?
+              arr = type_info_array[to.id].split(/\n/) %>
+            if (map.getZoom()<8) {
+              infoText.innerHTML = '<b><%=arr.shift.html_safe %></b><br><%=arr.join('<br>').html_safe%>';
+              controlDiv3.style.display = '';
+            }
+      <% else %>
+           infoText.innerHTML = '';
+           controlDiv3.style.display = 'none';
+      <% end %>
+         }
+         showHiddenObj();
+     });
+     mapobjs_typeof[<%= to.id %>] = [];
+ <% end %>
+
+   <% 2010.upto(2015) do |year| %>
+ var controlUI = document.createElement('div');
+     controlUI.style.margin = "4px";
+     controlUI.style.pading = "1px";
+     controlUI.style.backgroundColor = '#0000CD';
+     controlUI.setAttribute('id', 'year<%= year %>');
+     controlDiv.appendChild(controlUI);
+  var controlText = document.createElement('div');
+     controlText.style.opacity = '0.8';
+     controlText.style.borderRadius = "3px";
+     controlText.style.backgroundColor = '#FFF';
+     controlText.style.cursor = "none";
+     controlText.style.textAlign = "center";
+     controlText.style.fontFamily = "Roboto,Arial,sans-serif";
+     controlText.style.fontSize = "10px";
+     controlText.style.fontWeight = 'bold';
+     controlText.style.paddingTop = "0";
+     controlText.style.paddingBotton = "0";
+
+     controlText.innerHTML = '<table class=b_ctrl width=100%><td><%= year == 2015 ? "2015 - 2018" : year %></td></table>';
+     controlUI.appendChild(controlText);
+     show_yearButtons[<%=year%>] = true;
+     google.maps.event.addDomListener(controlUI, 'click', function() {
+         if (show_yearButtons[<%=year%>]) {
+            show_yearButtons[<%=year%>] = false;
+            $("#year<%=year%>").css('backgroundColor','#fff');
+            $("#year<%=year%>").css('opacity', '0.8');
+         }
+         else {
+            show_yearButtons[<%=year%>] = true;
+            $("#year<%=year%>").css('backgroundColor','#0000CD');
+            $("#year<%=year%>").css('opacity', '0.8');
+         }
+         showHiddenObj();
+     });
+     mapobjs_yearof[<%= year %>] = [];
+   <% end %>
+}
+
+function CenterControl(controlDiv, map) {
+
+  // Set CSS for the control border
+  var controlUI = document.createElement('div');
+  controlUI.className = "transparency";
+  controlUI.title = 'Click to recenter the map';
+  controlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior
+  var controlText = document.createElement('div');
+  controlText.className = "bctl";
+  controlText.style.cursor = "none";
+  controlText.innerHTML = '<table class=b_ctrl><td class=td_img><img src=/images/arrow_left.png></td><td>Возврат</td></table>';
+  controlUI.appendChild(controlText);
+
+  // Setup the click event listeners: simply set the map to
+  // Chicago
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+      map.setCenter(rostov_center);
+      map.setZoom(7);
+      infoWin.setMap(null);
+      controlDiv3.style.display = 'none';
+  });
+
+}
+
+function check_type_b(arr,m) {
+  for (var i=0; i < arr.length; i++) {
+    if ($.inArray(m,mapobjs_typeof[arr[i]])>=0) { 
+//console.log("find m=",m);
+      return true; }
+  }
+  return false;
+}
+
+function check_year_b(arr,m) {
+  for (var i=0; i < arr.length; i++) {
+    if ($.inArray(m,mapobjs_yearof[arr[i]])>=0) { return true; }
+  }
+  return false;
+}
+
+function showHiddenObj() {
+//console.log("mapobjs_typeof=",mapobjs_typeof);
+  if (allMarkers.length == 0) {
+    var keys_t = Object.keys(mapobjs_typeof);
+//console.log("keys_t = ",keys_t);
+    for (var i=0; i< keys_t.length; i++) { allMarkers = allMarkers.concat(mapobjs_typeof[keys_t[i]]); }
+  }
+
+//console.log(allMarkers);
+
+  var keys_t = Object.keys(show_objButtons),
+      keys_y = Object.keys(show_yearButtons);
+
+//console.log(allMarkers);
+
+  var show_y = keys_y.filter(function(y) { return show_yearButtons[y]; });
+  var show_t = keys_t.filter(function(y) { return show_objButtons[y]; });
+
+//console.log(show_y,show_t);
+//console.log(show_objButtons[show_t[0]]);
+
+  for(var i=0; i < allMarkers.length; i++) {
+    if (check_type_b(show_t,allMarkers[i]) && check_year_b(show_y,allMarkers[i])) {
+      allMarkers[i].setMap(map);
+    } else {
+      allMarkers[i].setMap(null);
+    }
+  }
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>

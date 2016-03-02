@@ -1,0 +1,46 @@
+<%= form_for(@poligon) do |f| %>
+  <% if @poligon.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@poligon.errors.count, "error") %> prohibited this poligon from being saved:</h2>
+
+      <ul>
+      <% @poligon.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :coords %><br>
+    <%= f.text_field :coords %>
+  </div>
+  <div class="field">
+    <%= f.label :area_id %><br>
+    <%= f.select :area_id, @areas.collect {|ar| [ar.name,ar.id] } %>
+  </div>
+  <div class="field">
+    <%= f.label :color %><br>
+    <select name=poligon[color] style="background: #<%=@poligon.color%>;" onChange="this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor">
+      <% marker_colors_helper.each do |c| %>
+          <option value=<%=c%> style="background: #<%=c%>;" <%= 'selected' if c==@poligon.color%>>&nbsp</option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_area :name, cols: 80, rows: 20 %>
+  </div>
+  <div class="field">
+    <%= f.label :url %><br>
+    <%= f.text_field :url %>
+  </div>
+  <div class="field">
+    <%= f.label :year %><br>
+    <%= f.text_field :year %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,32 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Type Objs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Objclass</th>
+      <th>Src</th>
+      <th>Img</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @type_objs.each do |type_obj| %>
+      <tr>
+        <td><%= type_obj.id %></td>
+        <td><%= type_obj.objclass %></td>
+        <td><%= type_obj.src %></td>
+        <td><img src=<%= type_obj.src %>></td>
+        <td><%= link_to 'Edit', edit_type_obj_path(type_obj) %></td>
+        <td><%= link_to 'Destroy', type_obj, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Type obj', new_type_obj_path %>

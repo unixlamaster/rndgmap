@@ -1,0 +1,21 @@
+<div id="panel" style="position: absolute;
+            top: 25px;
+            left:5px;
+            z-index: 5;
+            padding: 5px;
+            border: 1px solid #999;
+            width: 120px;">
+ <% @type_objs.each do |to| %>
+         <a href=# class="button small secondary"  onclick = "show_clearMarkers(<%= to.id%>); $(this).attr('class', 'disable');" style="width: 100%; padding: 0px; margin: 1px;">
+              <img src=<%= to.src %>> - <%= to.objclass%>
+           </a><br>
+  <% end %>
+  <hr>
+  <% select_year = params[:year].nil? ? [] : params[:year]
+      2010.upto(2014) do |year| %>
+    <a href=# class="button small <%= select_year.include?(year.to_s) ? 'disable' : 'secondary' %>"   onclick="$('#year<%= year %>').val('<%= year if select_year.include?(year.to_s) %>'); $('#myform').submit();" style="width: 100%; padding: 0px; margin: 1px;"><%= year%></a><br>
+      <% end %>
+
+ </div>
+ <div id="map-canvas"></div>
+

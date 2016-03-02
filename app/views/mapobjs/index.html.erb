@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Mapobjs</h1>
+
+<table border=1>
+  <thead>
+    <tr>
+      <th>Years</th>
+      <th>Class</th>
+      <th>Район</th>
+      <th>Latitude/Longitude</th>
+      <th>Name</th>
+      <th>Address</th>
+      <th>result</th>
+      <th>cost/amount</th>
+      <th>url</th>
+      <th>line</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @mapobjs.each do |mapobj| %>
+      <tr>
+        <td><%= mapobj.year %><br><%= mapobj.years2 %></td>
+        <td><%= mapobj.type_obj.objclass unless mapobj.type_obj.nil? %></td>
+        <td><%= mapobj.area.name unless mapobj.area.nil? %></td>
+        <td><%= mapobj.latitude %> <%= mapobj.longitude %></td>
+        <td><%= mapobj.name %></td>
+        <td><%= mapobj.address %></td>
+        <td><%= mapobj.result %></td>
+        <td><%= mapobj.cost %> <%= mapobj.amount%></td>
+        <td><%= mapobj.url %></td>
+        <td><%= mapobj.line %></td>
+        <td><%= link_to 'Edit', edit_mapobj_path(mapobj) %>
+          <%= link_to 'Del', mapobj_del_path(id: mapobj.id) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Mapobj', new_mapobj_path %>

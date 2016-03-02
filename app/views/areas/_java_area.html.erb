@@ -1,0 +1,41 @@
+    <script type="text/javascript"
+src="http://maps.googleapis.com/maps/api/js?key=AIzaSyB8_fY78Np6-muxaUYN0RHYaiAnaYxXh0A&sensor=false">
+          </script>
+    <script>
+
+// In the following example, markers appear when the user clicks on the map.
+// The markers are stored in an array.
+// The user can then click an option to hide, show or delete the markers.
+function initialize_area() {
+  var haightAshbury = new google.maps.LatLng(<%= @area.coords%>);
+  var mapOptions = {
+     zoom: <%= @area.zoom%>,
+    center: haightAshbury,
+    mapTypeId: google.maps.MapTypeId.HYBRID
+  };
+  var map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+  var markers = [];
+   <% @type_objs.each do |to| %>
+          markers[<%=to.id%>]=[];
+      markers[<%=to.id%>][0]=true;
+         markers[<%=to.id%>][1]=[];
+          <% end %>
+
+
+// Removes the markers from the map, but keeps them in the array.
+  function show_clearMarkers(type_id) {
+     if (markers[type_id][0]) {
+         setAllMap(null,type_id);
+         markers[type_id][0] = false;
+      } else {
+         setAllMap(map,type_id);
+         markers[type_id][0] = true;
+      }
+   }
+console.log("@area.zoom=<%= @area.zoom%>");
+console.log("map.getZoom()=",map.getZoom());
+}
+google.maps.event.addDomListener(window, 'load', initialize_area);
+
+    </script>

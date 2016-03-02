@@ -1,0 +1,41 @@
+<table width=50%>
+<td>
+<%= form_for(@area) do |f| %>
+  <% if @area.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@area.errors.count, "error") %> prohibited this area from being saved:</h2>
+
+      <ul>
+      <% @area.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :coords %><br>
+    <%= f.text_field :coords %>
+  </div>
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :zoom %><br>
+    <%= f.number_field :zoom %>
+  </div>
+  <div class="field">
+    <%= f.label :color %><br>
+    <select name=area[color] style="background: #<%=@area.color%>;" onChange="this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor">
+    <% marker_colors_helper.each do |c| %>
+      <option value=<%=c%> style="background: #<%=c%>;" <%= 'selected' if c==@area.color%>>&nbsp</option>
+    <% end %>
+    </select>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+</td>
+</table>

@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+  <video id="movie" width="100%" height="100%" controls autoplay>
+    <source src="<%= @mapobj.url %>" type='video/webm; codecs="vp8, vorbis"' />
+   <object id="flowplayer" type="application/x-shockwave-flash" 
+      width="100%" height="100%">
+    <param name="movie" value="video/flowplayer-3.2.5.swf" /> 
+    <param name="flashvars" value='config={"clip":"<%= @mapobj.url %>"}' />
+   </object>
+  </video>
+  <script>
+   var v = document.getElementById("movie");
+   v.onclick = function() {
+    if (v.paused) {
+     v.play();
+    } else {
+     v.pause();
+    }
+   };
+  </script>

@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Coords:</strong>
+  <%= @poligon.coords %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @poligon.name %>
+</p>
+
+<p>
+  <strong>Url:</strong>
+  <%= @poligon.url %>
+</p>
+
+<p>
+  <strong>Year:</strong>
+  <%= @poligon.year %>
+</p>
+
+<%= link_to 'Edit', edit_poligon_path(@poligon) %> |
+<%= link_to 'Back', poligons_path %>

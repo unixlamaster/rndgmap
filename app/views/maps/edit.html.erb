@@ -1,0 +1,103 @@
+    <script src="http://api-maps.yandex.ru/2.1/?load=package.full&lang=ru_RU" type="text/javascript"></script>
+    <script src="http://yandex.st/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        ymaps.ready(init);
+        var myMap, 
+            drawPoligon = false,
+            myPlacemark;
+
+function init(){ 
+    var  myMap = new ymaps.Map ("map", {
+                   center: [48.2368, 40.7437],
+                   zoom: 8,
+                   // Тип покрытия карты: "Спутник".
+                   type: 'yandex#satellite',
+                   controls: ['smallMapDefaultSet'] }),
+             polygon = new ymaps.GeoObject({
+                    geometry: { type: "Polygon", coordinates: [] }
+                    }),
+             addPoligon,
+             savePoligon;
+
+    myMap.controls.add('zoomControl');
+    myMap.controls.add('searchControl');
+
+    myMap.events.add('click', function (e) {
+       if (drawPoligon) { return;}
+       if (!myMap.balloon.isOpen()) {
+          var coords = e.get('coords');
+          myMap.balloon.open(coords, {
+                    contentBody:'<a href=/mapobjs/new?mapobj[latitude]='+ coords[0].toPrecision(6) + '&mapobj[longtitude]=' + coords[1].toPrecision(6) + '>Добавить новый объект</a>', contentFooter:'<sup>Координаты щелчка: ' + [
+                                    coords[0].toPrecision(6),
+                                    coords[1].toPrecision(6)
+                                  ].join(', ') + '</sup>'
+                    });
+         }
+       else {
+           myMap.balloon.close();
+          }
+      });
+
+
+          <% @mapobjs.each do |wo| %>
+            <% if ! wo.latitude.empty? && ! wo.longtitude.empty? %>
+            myPlacemark = new ymaps.Placemark([<%= wo.latitude %>, <%= wo.longtitude %>], {
+                content: '<%= wo.address %>',
+                balloonContent: '<a href=<%= wo.url %>><%= wo.name + " " + wo.address %></a>'
+            },
+              <%= objclass_icon(wo.objclass)%>
+              );
+            
+            myMap.geoObjects.add(myPlacemark);
+            <% end %>
+          <% end %>
+     
+
+          addPoligon = new ymaps.control.Button("Полигон");
+          addPoligon.events.add('click', function(e) {
+              drawPoligon = true;
+              myMap.geoObjects.add(polygon);
+              polygon.editor.startDrawing();
+          });
+                   
+          savePoligon = new ymaps.control.Button("Save");
+          savePoligon.events.add('click', function(e) {       
+              drawPoligon = false;
+              polygon.editor.stopEditing();
+              printGeometry(polygon.geometry.getCoordinates());
+           }); 
+
+          myMap.controls.add(addPoligon, {float: 'right'});
+          myMap.controls.add(savePoligon, {float: 'right'});
+   }
+
+    // Выводит массив координат геообъекта в <div id="geometry">
+ function printGeometry (coords) {
+    $('#poligon_coord').val(stringify(coords));
+    $('#poligon_form').submit();
+
+    function stringify (coords) {
+       var res = '';
+       if ($.isArray(coords)) {
+         res = '[ ';
+         for (var i = 0, l = coords.length; i < l; i++) {
+            if (i > 0) {
+                res += ', ';
+             }
+            res += stringify(coords[i]);
+         }
+         res += ' ]';
+      } else if (typeof coords == 'number') {
+           res = coords.toPrecision(6);
+      } else if (coords.toString) {
+           res = coords.toString();
+      }
+      return res;
+    }
+ }
+
+	 </script>
+    <div id="map" style="width: 100%; height: 90%"></div>
+    <%= form_tag new_poligon_path, :method => 'get', :id => 'poligon_form' do %> 
+      <input id=poligon_coord type=hidden name=poligon[coords] value="">
+    <% end %>  

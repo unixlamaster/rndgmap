@@ -1,0 +1,29 @@
+<%= form_for(@type_obj) do |f| %>
+  <% if @type_obj.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@type_obj.errors.count, "error") %> prohibited this type_obj from being saved:</h2>
+
+      <ul>
+      <% @type_obj.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :objclass %><br>
+    <%= f.text_field :objclass %>
+  </div>
+  <div class="field">
+    <%= f.label :src %><br>
+    <%= f.text_field :src %>
+  </div>
+  <div class="field">
+    <%= f.label :icon_src %><br>
+    <%= f.text_field :icon_src %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

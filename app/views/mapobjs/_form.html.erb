@@ -1,0 +1,60 @@
+<%= form_for(@mapobj) do |f| %>
+  <% if @mapobj.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@mapobj.errors.count, "error") %> prohibited this mapobj from being saved:</h2>
+
+      <ul>
+      <% @mapobj.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :type_id %><br>
+    <%= f.select :type_id, @type_objs.collect {|to| [to.objclass,to.id] } %>
+  </div>
+  <div class="field">
+    <%= f.label :area_id %><br>
+    <%= f.select :area_id, @areas.collect {|ar| [ar.name,ar.id] } %>
+  </div>
+  <div class="field">
+    <%= f.label :latitude %><br>
+    <%= f.text_field :latitude %>
+  </div>
+  <div class="field">
+    <%= f.label :longitude %><br>
+    <%= f.text_field :longitude %>
+  </div>
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name, size: 100 %>
+  </div>
+  <div class="field">
+    <%= f.label :address %><br>
+    <%= f.text_field :address, size: 100 %>
+  </div>
+  <div class="field"><%= f.label :result %><br><%= f.text_area :result %></div>
+  <div class="field"><%= f.label :amount %><br><%= f.text_area :amount %></div>
+  <div class="field"><%= f.label :cost %><br><%= f.text_field :cost %></div>
+  <div class="field">
+    <%= f.label :year %><br>
+    <%= f.text_field :year %>
+  </div>
+  <div class="field">
+    <%= f.label :years2 %><br>
+    <%= f.text_field :years2 %>
+  </div>
+  <div class="field">
+    <%= f.label :url %><br>
+    <%= f.text_field :url %>
+  </div>
+  <div class="field">
+        <%= f.label :line %><br>
+        <%= f.text_field :line %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
